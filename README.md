@@ -1,8 +1,6 @@
 # DraggablePanel
 
-![Alt text](output/ezgif.com-video-to-gif.gif) | ![Alt text](output/Screenshot_20190417-173713.png)  | ![Alt text](output/Screenshot_20190417-173738.png) 
---- | --- | --- 
-![Alt text](output/Screenshot_20190417-173732.png) | ![Alt text](output/Screenshot_20190417-173744.png)  | ![Alt text](output/Screenshot_20190417-173721.png) 
+![Alt text](output/ezgif.com-video-to-gif.gif)
 
 #### Download
 
@@ -17,7 +15,7 @@
     
     
     	dependencies {
-	        implementation 'com.github.hoanganhtuan95ptit:DraggablePanel:1.1.9'
+	        implementation 'com.github.tuanhav95:DragView:1.0.0'
 	}
 ```
 
