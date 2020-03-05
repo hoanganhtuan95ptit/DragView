@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="DragView" >
+        <attr name="height_when_max" format="dimension" />
+
+        <attr name="percent_when_middle" format="float" />
+
+        <attr name="height_when_min" format="dimension" />
+
+        <attr name="margin_edge_when_min" format="dimension" />
+
+        <attr name="margin_bottom_when_min" format="dimension" />
+
+        <attr name="state" format="enum">
+            <enum name="MAX" value="0"/>
+            <enum name="MIN" value="1"/>
+            <enum name="CLOSE" value="2"/>
+        </attr>
+    </declare-styleable>
+</resources>
