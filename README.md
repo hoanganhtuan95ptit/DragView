@@ -19,7 +19,7 @@
 	}
 ```
 
-#### Using [Detail code java](https://github.com/hoanganhtuan95ptit/DraggablePanel/blob/master/example/src/main/java/com/hoanganhtuan95ptit/example/NormalActivity.kt)
+#### Using [Detail code java](https://github.com/tuanhav95/DragView/blob/master/example/src/main/java/com/tuanhav95/example/NormalActivity.kt)
 
 * Xml
 
