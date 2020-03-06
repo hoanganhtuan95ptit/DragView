@@ -24,7 +24,7 @@
 * Xml
 
 ```java
-        <com.hoanganhtuan95ptit.draggable.DraggablePanel
+        <com.tuanhav95.draggable.DraggablePanel
                 android:id="@+id/draggablePanel"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -117,7 +117,7 @@
 
 * Xml
 ```java
-        <com.hoanganhtuan95ptit.example.custom.DraggableSource
+        <com.tuanhav95.example.custom.DraggableSource
                 android:id="@+id/draggablePanel"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
