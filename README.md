@@ -1,4 +1,4 @@
-# DraggablePanel
+# DragView
 
 ![Alt text](output/ezgif.com-video-to-gif.gif)
 
