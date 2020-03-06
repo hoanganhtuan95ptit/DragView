@@ -69,7 +69,7 @@ open class DragView @JvmOverloads constructor(
     var mMarginEdgeWhenMin = 0
     var mMarginBottomWhenMin = 0
 
-    var mDraggableListener: DraggableListener? = null
+    var mDragListener: DragListener? = null
 
     init {
 
@@ -252,8 +252,8 @@ open class DragView @JvmOverloads constructor(
         return frameSecond
     }
 
-    open fun setDraggableListener(draggableListener: DraggableListener) {
-        mDraggableListener = draggableListener
+    open fun setDragListener(dragListener: DragListener) {
+        mDragListener = dragListener
     }
 
     /**
@@ -395,7 +395,7 @@ open class DragView @JvmOverloads constructor(
 
         updateState()
 
-        mDraggableListener?.onChangePercent(mCurrentPercent)
+        mDragListener?.onChangePercent(mCurrentPercent)
 
         val layoutParams = frameDrag.layoutParams as LayoutParams
         layoutParams.topMargin = (mMarginTopWhenMin * mCurrentPercent).toInt()
@@ -487,12 +487,12 @@ open class DragView @JvmOverloads constructor(
 
             if (state != null && mCurrentState != state) {
                 mCurrentState = state
-                mDraggableListener?.onChangeState(mCurrentState!!)
+                mDragListener?.onChangeState(mCurrentState!!)
             }
         }
     }
 
-    interface DraggableListener {
+    interface DragListener {
         fun onChangeState(state: State) {}
         fun onChangePercent(percent: Float) {}
     }

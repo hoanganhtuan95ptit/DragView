@@ -8,7 +8,7 @@ import com.tuanhav95.drag.utils.reWidth
 import com.tuanhav95.example.R
 import kotlinx.android.synthetic.main.layout_top.view.*
 
-class DraggableSource @JvmOverloads constructor(
+class DragSource @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : DragView(context, attrs, defStyleAttr) {
 

@@ -37,8 +37,8 @@
         android:layout_height="match_parent"
         android:background="#000" />
 
-    <com.tuanhav95.example.custom.DraggableSource
-        android:id="@+id/draggablePanel"
+    <com.tuanhav95.example.custom.DragSource
+        android:id="@+id/dragView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:height_when_max="300dp"

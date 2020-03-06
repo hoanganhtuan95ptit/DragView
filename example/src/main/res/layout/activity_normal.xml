@@ -38,7 +38,7 @@
         android:background="#000" />
 
     <com.tuanhav95.drag.DragView
-        android:id="@+id/draggablePanel"
+        android:id="@+id/dragView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:height_when_max="300dp"

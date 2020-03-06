@@ -14,7 +14,7 @@ class CustomActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_custom)
 
-        draggablePanel.setDraggableListener(object : DragView.DraggableListener {
+        dragView.setDragListener(object : DragView.DragListener {
             override fun onChangeState(state: DragView.State) {
             }
 
@@ -28,9 +28,9 @@ class CustomActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction().add(R.id.frameTop, TopFragment()).commit()
         supportFragmentManager.beginTransaction().add(R.id.frameBottom, BottomFragment()).commit()
 
-        btnMax.setOnClickListener { draggablePanel.maximize() }
-        btnMin.setOnClickListener { draggablePanel.minimize() }
-        btnClose.setOnClickListener { draggablePanel.close() }
+        btnMax.setOnClickListener { dragView.maximize() }
+        btnMin.setOnClickListener { dragView.minimize() }
+        btnClose.setOnClickListener { dragView.close() }
 
     }
 }

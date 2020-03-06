@@ -13,7 +13,7 @@ class NormalActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_normal)
 
-        draggablePanel.setDraggableListener(object : DragView.DraggableListener {
+        dragView.setDragListener(object : DragView.DragListener {
             override fun onChangeState(state: DragView.State) {
             }
 
@@ -26,9 +26,9 @@ class NormalActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction().add(R.id.frameFirst, TopFragment()).commit()
         supportFragmentManager.beginTransaction().add(R.id.frameSecond, BottomFragment()).commit()
 
-        btnMax.setOnClickListener { draggablePanel.maximize() }
-        btnMin.setOnClickListener { draggablePanel.minimize() }
-        btnClose.setOnClickListener { draggablePanel.close() }
+        btnMax.setOnClickListener { dragView.maximize() }
+        btnMin.setOnClickListener { dragView.minimize() }
+        btnClose.setOnClickListener { dragView.close() }
 
     }
 }
