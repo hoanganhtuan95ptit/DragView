@@ -29,6 +29,20 @@
             android:layout_height="wrap_content"
             android:text="Close" />
 
+        <EditText
+            android:id="@+id/etHeightMax"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:digits="0123456789"
+            android:hint="Enter height max db (max 350, min 200)"
+            android:inputType="number" />
+
+        <Button
+            android:id="@+id/btnSetHeightMax"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Height Max" />
     </LinearLayout>
 
     <View

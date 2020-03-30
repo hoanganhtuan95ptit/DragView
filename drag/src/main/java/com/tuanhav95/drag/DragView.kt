@@ -2,6 +2,7 @@ package com.tuanhav95.drag
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.*
 import android.widget.RelativeLayout
@@ -10,7 +11,7 @@ import com.google.android.material.appbar.AppBarLayout
 import com.tuanhav95.drag.utils.*
 import com.tuanhav95.drag.widget.DragBehavior
 import com.tuanhav95.drag.widget.DragLayout
-import kotlinx.android.synthetic.main.layout_draggable_panel.view.*
+import kotlinx.android.synthetic.main.layout_drag_view.view.*
 import kotlin.math.abs
 
 open class DragView @JvmOverloads constructor(
@@ -18,6 +19,8 @@ open class DragView @JvmOverloads constructor(
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
     companion object {
+
+        var DEBUG = true
 
         private var scaledTouchSlop = 0
 
@@ -41,29 +44,31 @@ open class DragView @JvmOverloads constructor(
         }
     }
 
+    var showKeyboard = false
     var frameInitializing = false// toàn bộ giao diện đã được khởi tạo hay chưa
 
-    var finalState: State? = null// trạng thái của Draggable đang hướng đến
-    var finalHeight = 0// chiều tao của view first đang hướng đến khi max
-
+    var needExpand = true// cần expand appbarLayout
     var firstViewMove = false// view first đang được di chuyển
 
-    var velocityY = 0f
-    var velocityTracker: VelocityTracker? = null
+    var mTempState: State? = null// trạng thái của Draggable đang hướng đến
+    var mTempHeight = 0// chiều tao của view first đang hướng đến khi max
+
+    var velocityY = 0f// tốc độ khi  MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL
+    var velocityTracker: VelocityTracker? = null // tốc độ khi  MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL
 
     var mCurrentState: State? = null
     var mCurrentPercent = -1f
     var mCurrentMarginTop = -1
 
     var mHeightWhenMax = 0
-    var mHeightWhenMaxDefault = 0
+    var mHeightWhenMaxDefault = -1
 
     var mHeightWhenMiddle = 0
-    var mHeightWhenMiddleDefault = 0
+    var mHeightWhenMiddleDefault = -1
     var mPercentWhenMiddle = 0f
 
     var mHeightWhenMin = 0
-    var mHeightWhenMinDefault = 0
+    var mHeightWhenMinDefault = -1
 
     var mMarginTopWhenMin = 0
     var mMarginEdgeWhenMin = 0
@@ -75,11 +80,11 @@ open class DragView @JvmOverloads constructor(
 
         visibility = View.INVISIBLE
 
-        inflate(context, R.layout.layout_draggable_panel, this)
+        inflate(context, R.layout.layout_drag_view, this)
 
         if (attrs != null) {
             val typedArray = context.obtainStyledAttributes(attrs, R.styleable.DragView)
-            mHeightWhenMax = typedArray.getDimensionPixelSize(R.styleable.DragView_height_when_max, 200.toPx())
+            mTempHeight = typedArray.getDimensionPixelSize(R.styleable.DragView_height_when_max, 200.toPx())
 
             mPercentWhenMiddle = typedArray.getFloat(R.styleable.DragView_percent_when_middle, 0.9f)
 
@@ -89,11 +94,11 @@ open class DragView @JvmOverloads constructor(
 
             mMarginBottomWhenMin = typedArray.getDimensionPixelSize(R.styleable.DragView_margin_bottom_when_min, 8.toPx())
 
-            finalState = State.values()[typedArray.getInt(R.styleable.DragView_state, 3)]
+            mTempState = State.values()[typedArray.getInt(R.styleable.DragView_state, 3)]
 
             typedArray.recycle()
         } else {
-            mHeightWhenMax = 200.toPx()
+            mTempHeight = 200.toPx()
 
             mPercentWhenMiddle = 0.9f
 
@@ -103,11 +108,10 @@ open class DragView @JvmOverloads constructor(
 
             mMarginBottomWhenMin = 8.toPx()
 
-            finalState = State.CLOSE
+            mTempState = State.CLOSE
         }
 
-        finalHeight = mHeightWhenMax
-        mHeightWhenMaxDefault = mHeightWhenMax
+        mHeightWhenMaxDefault = mTempHeight
         mHeightWhenMinDefault = mHeightWhenMin
 
         frameDrag.onTouchListener = object : DragLayout.OnTouchListener {
@@ -179,24 +183,37 @@ open class DragView @JvmOverloads constructor(
         }
 
         viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            private var currentHeight = 0
             override fun onGlobalLayout() {
-                viewTreeObserver.removeOnGlobalLayoutListener(this)
+                if (height == currentHeight) return
+                currentHeight = height
+
+                val r = Rect()
+
+                getWindowVisibleDisplayFrame(r)
+
+                val screenHeight = rootView.height
+                val keyboardHeight = screenHeight - r.bottom
+
+                if (keyboardHeight > 200) {
+                    showKeyboard = true
+                    appbarLayout.setExpanded(false, false)
+                } else {
+                    showKeyboard = false
+                }
+
                 initFrame()
             }
         })
 
-        appbarLayout.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
-
-            private var verticalOffsetOld = 0
-
-            override fun onOffsetChanged(appBarLayout: AppBarLayout?, verticalOffset: Int) {
-                if (frameInitializing && mCurrentPercent == 0f && !firstViewMove) {
-                    val offset = abs(verticalOffset)
-                    val delta = offset - verticalOffsetOld
-                    verticalOffsetOld = offset
-
-                    mHeightWhenMin += delta
-                    mHeightWhenMiddle += delta
+        appbarLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { _, verticalOffset ->
+            if (frameInitializing && !firstViewMove) {
+                if (mCurrentPercent == 0f) {
+                    mHeightWhenMin = mHeightWhenMinDefault - verticalOffset
+                    mHeightWhenMiddle = mHeightWhenMiddleDefault - verticalOffset
+                } else if (mCurrentPercent == 1f && showKeyboard) {
+                    mHeightWhenMin = mHeightWhenMinDefault
+                    mHeightWhenMiddle = mHeightWhenMiddleDefault
                 }
             }
         })
@@ -208,36 +225,59 @@ open class DragView @JvmOverloads constructor(
     open fun initFrame() {
         frameInitializing = true
 
-        val params = frameFirst.layoutParams as CoordinatorLayout.LayoutParams
-        params.behavior = DragBehavior(frameSecond)
-        frameFirst.layoutParams = params
+        mMarginTopWhenMin = height - mHeightWhenMinDefault - mMarginBottomWhenMin
 
-        mMarginTopWhenMin = height - mHeightWhenMin - mMarginBottomWhenMin
+        if (mCurrentState == null) {
+            val params = frameFirst.layoutParams as CoordinatorLayout.LayoutParams
+            params.behavior = DragBehavior(frameSecond)
+            frameFirst.layoutParams = params
+        }
 
-        mHeightWhenMax = finalHeight
-        mHeightWhenMaxDefault = (width * 9 / 16f).toInt()
+        mHeightWhenMax = mTempHeight
+        if (mCurrentState == null) {
+            mHeightWhenMaxDefault = (width * 9 / 16f).toInt()
+        }
 
         mHeightWhenMiddle = (height - mPercentWhenMiddle * mMarginBottomWhenMin - mPercentWhenMiddle * mMarginTopWhenMin).toInt()
-        mHeightWhenMiddleDefault = mHeightWhenMiddle
-
-        /**
-         * close
-         */
-        translationY = (mHeightWhenMinDefault + mMarginBottomWhenMin).toFloat()
-        setMarginTop(mMarginTopWhenMin)
-        gone()
-
-        when (finalState) {
-            State.MAX -> {
-                maximize()
-            }
-            State.MIN -> {
-                minimize()
-            }
-            else -> {
-                close()
-            }
+        if (mCurrentState == null) {
+            mHeightWhenMiddleDefault = mHeightWhenMiddle
         }
+
+
+        if (mCurrentState == null) {
+
+            translationY = (mHeightWhenMinDefault + mMarginBottomWhenMin).toFloat()
+            setMarginTop(mMarginTopWhenMin)
+            gone()
+
+            when (mTempState) {
+                State.MAX -> {
+                    maximize()
+                }
+                State.MIN -> {
+                    minimize()
+                }
+                else -> {
+                    close()
+                }
+            }
+        } else {
+            refresh()
+            mCurrentMarginTop = (frameDrag.layoutParams as LayoutParams).topMargin
+        }
+
+    }
+
+    open fun isMaximize(): Boolean {
+        return mCurrentState == State.MAX
+    }
+
+    open fun isMinimize(): Boolean {
+        return mCurrentState == State.MIN
+    }
+
+    open fun isClose(): Boolean {
+        return mCurrentState == State.CLOSE
     }
 
     open fun getFrameDrag(): ViewGroup {
@@ -259,44 +299,70 @@ open class DragView @JvmOverloads constructor(
     /**
      * thiết lập chiều cao first view
      */
-    open fun setHeightMax(height: Int) {
-        finalHeight = height
-        if (frameInitializing && finalState == mCurrentState) {// nếu view đã được khởi tạo và đã không drag thì sẽ mở rộng
+    open fun setHeightMax(height: Int, goToMaximize: Boolean = true) {
+        needExpand = true
+        mTempHeight = height
+        if (frameInitializing && mTempState == mCurrentState && goToMaximize) {// nếu view đã được khởi tạo và đã không drag thì sẽ mở rộng
             maximize()
         }
     }
 
     /**
-     * mở rộng view
+     * mở rộng lâyout
      */
     open fun maximize() {
-        finalState = State.MAX
+        mTempState = State.MAX
         if (!frameInitializing) {
             return
         }
         when (mCurrentState) {
             State.MAX -> {
-                appbarLayout.resizeAnimation(-1, finalHeight, 300) {
-                    mHeightWhenMax = finalHeight
+                appbarLayout.resizeAnimation(-1, mTempHeight, 300) {
+                    mHeightWhenMax = mTempHeight
+
+                    if (mCurrentPercent != 0f || (!needExpand && !showKeyboard)) {
+                        updateState()
+                        return@resizeAnimation
+                    }
+
+                    appbarLayout.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
+                        override fun onOffsetChanged(appBarLayout: AppBarLayout?, verticalOffset: Int) {
+                            if (mCurrentPercent != 0f || !needExpand) {
+                                appbarLayout.removeOnOffsetChangedListener(this)
+                                return
+                            }
+
+                            if (abs(verticalOffset) == 0) {
+                                updateState()
+
+                                needExpand = false
+
+                                mDragListener?.onExpanded()
+
+                                appbarLayout.removeOnOffsetChangedListener(this)
+                            }
+                        }
+                    })
                     appbarLayout.setExpanded(true, true)
-                    updateState()
                 }
             }
             State.MIN -> {
                 minToMaxAnim { maximize() }
             }
-            else -> {
+            State.CLOSE -> {
                 visible()
                 closeToMinAnim { maximize() }
+            }
+            else -> {
             }
         }
     }
 
     /**
-     * thu nhỏ view
+     * thu nhỏ layout
      */
     open fun minimize() {
-        finalState = State.MIN
+        mTempState = State.MIN
         if (!frameInitializing) {
             return
         }
@@ -308,18 +374,20 @@ open class DragView @JvmOverloads constructor(
                 visible()
                 updateState()
             }
-            else -> {
+            State.CLOSE -> {
                 visible()
                 closeToMinAnim { minimize() }
+            }
+            else -> {
             }
         }
     }
 
     /**
-     * đóng view
+     * đóng layout
      */
     open fun close() {
-        finalState = State.CLOSE
+        mTempState = State.CLOSE
         if (!frameInitializing) {
             return
         }
@@ -330,9 +398,12 @@ open class DragView @JvmOverloads constructor(
             State.MIN -> {
                 minToCloseAnim { close() }
             }
-            else -> {
+            State.CLOSE -> {
                 gone()
                 updateState()
+            }
+            else -> {
+
             }
         }
     }
@@ -389,7 +460,7 @@ open class DragView @JvmOverloads constructor(
     }
 
     /**
-     * cập nhật toàn bộ giao diện
+     * update ui all view
      */
     open fun refresh() {
 
@@ -422,7 +493,7 @@ open class DragView @JvmOverloads constructor(
     }
 
     /**
-     * cập nhật giao diện First View
+     * update ui frame first
      */
     open fun refreshFrameFirst() {
         val frameFistHeight = if (mCurrentPercent < mPercentWhenMiddle) {
@@ -430,28 +501,29 @@ open class DragView @JvmOverloads constructor(
         } else {
             (mHeightWhenMiddle - (mHeightWhenMiddle - mHeightWhenMin) * (mCurrentPercent - mPercentWhenMiddle) / (1 - mPercentWhenMiddle))
         }
+
         appbarLayout.reHeight(frameFistHeight.toInt())
     }
 
     private fun minToMaxAnim(onEnd: () -> Unit) {
-        finalState = State.MAX
+        mTempState = State.MAX
         springYAnim(0f, onEnd)
     }
 
     private fun maxToMinAnim(onEnd: () -> Unit) {
-        finalState = State.MIN
+        mTempState = State.MIN
         springYAnim(mMarginTopWhenMin.toFloat(), onEnd)
     }
 
     private fun minToCloseAnim(onEnd: () -> Unit) {
-        finalState = State.CLOSE
+        mTempState = State.CLOSE
         translationYAnim((mHeightWhenMinDefault + mMarginBottomWhenMin).toFloat()) {
             onEnd()
         }
     }
 
     private fun closeToMinAnim(onEnd: () -> Unit) {
-        finalState = State.MIN
+        mTempState = State.MIN
         translationYAnim((0).toFloat()) {
             onEnd()
         }
@@ -484,7 +556,6 @@ open class DragView @JvmOverloads constructor(
             } else {
                 null
             }
-
             if (state != null && mCurrentState != state) {
                 mCurrentState = state
                 mDragListener?.onChangeState(mCurrentState!!)
@@ -493,6 +564,7 @@ open class DragView @JvmOverloads constructor(
     }
 
     interface DragListener {
+        fun onExpanded() {}
         fun onChangeState(state: State) {}
         fun onChangePercent(percent: Float) {}
     }

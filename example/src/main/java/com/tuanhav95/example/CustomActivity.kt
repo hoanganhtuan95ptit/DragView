@@ -1,12 +1,15 @@
 package com.tuanhav95.example
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.tuanhav95.drag.DragView
+import com.tuanhav95.drag.utils.toPx
 import com.tuanhav95.example.fragment.BottomFragment
 import com.tuanhav95.example.fragment.TopFragment
 import kotlinx.android.synthetic.main.activity_custom.*
 import kotlinx.android.synthetic.main.layout_bottom.*
+import kotlin.math.max
+import kotlin.math.min
 
 class CustomActivity : AppCompatActivity() {
 
@@ -32,5 +35,15 @@ class CustomActivity : AppCompatActivity() {
         btnMin.setOnClickListener { dragView.minimize() }
         btnClose.setOnClickListener { dragView.close() }
 
+        btnSetHeightMax.setOnClickListener {
+            var heightMax = 0
+            if (etHeightMax.text.isNotEmpty()) {
+                heightMax = etHeightMax.text.toString().toInt()
+            }
+            heightMax = max(heightMax, 200)
+            heightMax = min(heightMax, 400)
+
+            dragView.setHeightMax(heightMax.toPx(), true)
+        }
     }
 }

@@ -18,6 +18,12 @@ fun Float.springAnimation(minValue: Float,
                           endValue: Float,
                           onUpdate: (Float) -> Unit,
                           onEnd: () -> Unit) {
+
+    println("" +
+            minValue + "   " +
+            maxValue + "   " +
+            startValue + "   " +
+            endValue + "   " )
     val springX = SpringForce(endValue)
     springX.dampingRatio = 0.7f
     springX.stiffness = 300f
