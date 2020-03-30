@@ -15,7 +15,7 @@
     
     
     	dependencies {
-	        implementation 'com.github.tuanhav95:DragView:1.0.0'
+	        implementation 'com.github.tuanhav95:DragView:1.1.0'
 	}
 ```
 
