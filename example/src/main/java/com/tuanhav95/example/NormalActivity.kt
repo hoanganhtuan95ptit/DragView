@@ -23,8 +23,7 @@ class NormalActivity : AppCompatActivity() {
 
         })
 
-        supportFragmentManager.beginTransaction().add(R.id.frameFirst, TopFragment()).commit()
-        supportFragmentManager.beginTransaction().add(R.id.frameSecond, BottomFragment()).commit()
+        dragView.setDragViewFragment(supportFragmentManager, TopFragment(), BottomFragment())
 
         btnMax.setOnClickListener { dragView.maximize() }
         btnMin.setOnClickListener { dragView.minimize() }

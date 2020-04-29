@@ -4,9 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Rect
 import android.util.AttributeSet
+import android.util.Log
 import android.view.*
 import android.widget.RelativeLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.google.android.material.appbar.AppBarLayout
 import com.tuanhav95.drag.utils.*
 import com.tuanhav95.drag.widget.DragBehavior
@@ -294,6 +297,14 @@ open class DragView @JvmOverloads constructor(
 
     open fun setDragListener(dragListener: DragListener) {
         mDragListener = dragListener
+    }
+
+    /**
+     * Set the fragment of DragView.
+     */
+    open fun setDragViewFragment(fragmentManager: FragmentManager, topFragment: Fragment, bottomFragment: Fragment) {
+        fragmentManager.beginTransaction().add(R.id.frameFirst, topFragment).commit()
+        fragmentManager.beginTransaction().add(R.id.frameSecond, bottomFragment).commit()
     }
 
     /**
