@@ -5,13 +5,13 @@ import androidx.appcompat.app.AppCompatActivity
 import com.tuanhav95.drag.DragView
 import com.tuanhav95.drag.utils.toPx
 import com.tuanhav95.example.fragment.BottomFragment
-import com.tuanhav95.example.fragment.NormalTopFragment
+import com.tuanhav95.example.fragment.ExoPlayerTopFragment
 import kotlinx.android.synthetic.main.activity_custom.*
 import kotlinx.android.synthetic.main.layout_bottom.*
 import kotlin.math.max
 import kotlin.math.min
 
-class CustomActivity : AppCompatActivity() {
+class ExoPlayerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +28,7 @@ class CustomActivity : AppCompatActivity() {
 
         })
 
-        supportFragmentManager.beginTransaction().add(R.id.frameTop, NormalTopFragment()).commit()
+        supportFragmentManager.beginTransaction().add(R.id.frameTop, ExoPlayerTopFragment()).commit()
         supportFragmentManager.beginTransaction().add(R.id.frameBottom, BottomFragment()).commit()
 
         btnMax.setOnClickListener { dragView.maximize() }

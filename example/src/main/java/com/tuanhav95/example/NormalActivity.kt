@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.tuanhav95.drag.DragView
 import com.tuanhav95.example.fragment.BottomFragment
-import com.tuanhav95.example.fragment.TopFragment
+import com.tuanhav95.example.fragment.NormalTopFragment
 import kotlinx.android.synthetic.main.activity_normal.*
 
 class NormalActivity : AppCompatActivity() {
@@ -23,7 +23,7 @@ class NormalActivity : AppCompatActivity() {
 
         })
 
-        supportFragmentManager.beginTransaction().add(R.id.frameFirst, TopFragment()).commit()
+        supportFragmentManager.beginTransaction().add(R.id.frameFirst, NormalTopFragment()).commit()
         supportFragmentManager.beginTransaction().add(R.id.frameSecond, BottomFragment()).commit()
 
         btnMax.setOnClickListener { dragView.maximize() }

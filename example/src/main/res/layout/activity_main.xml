@@ -22,5 +22,10 @@
             android:layout_height="wrap_content"
             android:text="Custom" />
 
+        <Button
+            android:id="@+id/btnExoplayer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Exoplayer" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

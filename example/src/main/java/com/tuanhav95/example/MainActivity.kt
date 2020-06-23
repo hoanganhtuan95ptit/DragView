@@ -12,7 +12,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         btnNormal.setOnClickListener { startActivity(Intent(this, NormalActivity::class.java)) }
+
         btnCustom.setOnClickListener { startActivity(Intent(this, CustomActivity::class.java)) }
+
+        btnExoplayer.setOnClickListener { startActivity(Intent(this, ExoPlayerActivity::class.java)) }
 
     }
 }
